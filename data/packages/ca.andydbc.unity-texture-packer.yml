@@ -1,0 +1,14 @@
+name: ca.andydbc.unity-texture-packer
+displayName: Texture Channel Packer
+description: >-
+  :hammer: Utility to combine color channels from different textures into a
+  single output.
+repoUrl: 'https://github.com/andydbc/unity-texture-packer'
+parentRepoUrl: null
+licenseSpdxId: null
+licenseName: MIT
+topics:
+  - asset-management
+hunter: pixelwizards
+gitTagIgnore: ''
+createdAt: 1579921084542

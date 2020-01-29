@@ -27,7 +27,7 @@
                   class="form-group column col-12"
                   :class="{ 'has-error': form.repo.error }"
                 >
-                  <label class="form-label">Repository</label>
+                  <label class="form-label required">Repository</label>
                   <div class="input-group">
                     <span class="input-group-addon">github.com/</span>
                     <input
@@ -56,7 +56,7 @@
                     'has-error': form.branch.error
                   }"
                 >
-                  <label class="form-label">Branch</label>
+                  <label class="form-label required">Branch</label>
                   <select
                     v-model="form.branch.value"
                     class="form-select"
@@ -82,11 +82,13 @@
                   id="packageJson"
                   class="form-group column col-12"
                   :class="{
-                    hide: hideOtherFields || !$data.form.branch.value,
+                    hide: hideOtherFields || !form.branch.value,
                     'has-error': form.packageJson.error
                   }"
                 >
-                  <label class="form-label">Path of package.json</label>
+                  <label class="form-label required">
+                    Path of package.json
+                  </label>
                   <select
                     v-model="form.packageJson.value"
                     class="form-select"
@@ -172,6 +174,37 @@
                 </div>
                 <div
                   class="form-group column col-12"
+                  :class="{
+                    hide: hideOtherFields,
+                    'has-error': form.image.error
+                  }"
+                >
+                  <label v-if="repoImages.length" class="form-label"
+                    >Featured image</label
+                  >
+                  <div v-if="repoImages.length" class="columns pkg-img-columns">
+                    <div
+                      v-for="item in repoImages"
+                      :key="item"
+                      class="column col-3"
+                    >
+                      <div
+                        :class="{
+                          'pkg-img-wrap': true,
+                          selected: form.image.value == item
+                        }"
+                        @click="onSelectImage(item)"
+                      >
+                        <img :src="item" class="img-responsive pkg-img" />
+                      </div>
+                    </div>
+                  </div>
+                  <span v-if="form.image.error" class="form-input-hint">
+                    {{ form.image.error }}
+                  </span>
+                </div>
+                <div
+                  class="form-group column col-12"
                   :class="{ hide: hideOtherFields }"
                 >
                   <label class="form-label">Discovered by</label>
@@ -199,7 +232,7 @@
               </div>
             </fieldset>
             <div v-else>
-              <h6>Package name: {{ this.$data.packageInfo.name }}</h6>
+              <h6>Package name: {{ packageInfo.name }}</h6>
               <h6>Meta data:</h6>
               <pre class="code file-content" data-lang="yaml">
                 <code>{{ yaml }}</code>
@@ -347,10 +380,9 @@ import spdx from "spdx-license-list";
 import urljoin from "url-join";
 import yaml from "js-yaml";
 
-import ParentLayout from "@theme/layouts/Layout.vue";
 import NavLink from "@parent-theme/components/NavLink.vue";
-
-const apiRepoUrl = "https://api.github.com/repos/";
+import ParentLayout from "@theme/layouts/Layout.vue";
+import util from "@root/docs/.vuepress/util";
 
 const SubmitStep = new Enum({
   FillForm: 0,
@@ -365,16 +397,15 @@ export default {
       isSubmitting: false,
       step: 0,
       form: {
-        repo: {
-          error: "",
-          value: ""
-        },
         branch: {
           error: "",
           value: ""
         },
-        packageJson: {
-          prompt: "",
+        gitTagIgnore: {
+          error: "",
+          value: ""
+        },
+        hunter: {
           error: "",
           value: ""
         },
@@ -386,21 +417,27 @@ export default {
           error: "",
           value: ""
         },
+        image: {
+          error: "",
+          value: null
+        },
+        packageJson: {
+          prompt: "",
+          error: "",
+          value: ""
+        },
+        repo: {
+          error: "",
+          value: ""
+        },
         topics: {
           error: "",
           options: []
-        },
-        hunter: {
-          error: "",
-          value: ""
-        },
-        gitTagIgnore: {
-          error: "",
-          value: ""
         }
       },
       hideOtherFields: true,
       repoInfo: {},
+      repoImages: [],
       packageJsonPaths: {},
       packageInfo: {},
       branches: [],
@@ -428,7 +465,7 @@ export default {
       const qs = querystring.stringify({
         filename: "data/packages/" + this.$data.yamlFilename,
         value: this.$data.yaml,
-        message: `feat: new package ${this.$data.packageInfo.name}`
+        message: `chore(data): new package ${this.$data.packageInfo.name}`
       });
       return {
         link: "https://github.com/openupm/openupm/new/master/?" + qs,
@@ -476,10 +513,15 @@ export default {
         this.$data.step = SubmitStep.FillForm.value;
         this.fetchRepoInfo();
         this.fetchBranches();
+        this.fetchRepoImage();
       }
     },
+    onSelectImage(item) {
+      if (this.$data.form.image.value != item)
+        this.$data.form.image.value = item;
+      else this.$data.form.image.value = null;
+    },
     onVerifyClick() {
-      console.log("onVerifyClick");
       this.$data.isSubmitting = true;
       this.fetchPackageInfo();
     },
@@ -499,13 +541,14 @@ export default {
         displayName: packageInfo.displayName || "",
         description: repoInfo.description,
         repoUrl: repoInfo.html_url,
-        repoBranch: form.branch.value,
         parentRepoUrl: repoInfo.parent ? repoInfo.parent.html_url : null,
         licenseSpdxId: form.licenseId.value,
         licenseName: form.licenseName.value,
         topics: form.topics.options.filter(x => x.value).map(x => x.slug),
         hunter: form.hunter.value,
-        gitTagIgnore: form.gitTagIgnore.value
+        gitTagIgnore: form.gitTagIgnore.value,
+        image: form.image.value,
+        createdAt: new Date().getTime()
       };
       return yaml.safeDump(content);
     },
@@ -529,9 +572,12 @@ export default {
         // Clean error message.
         this.resetFormError();
         // Fetch.
-        let resp = await axios.get(urljoin(apiRepoUrl, this.form.repo.value), {
-          headers: { Accept: "application/vnd.github.v3.json" }
-        });
+        let resp = await axios.get(
+          urljoin(util.githubReposApiUrl, this.form.repo.value),
+          {
+            headers: { Accept: "application/vnd.github.v3.json" }
+          }
+        );
         // Show all fields.
         this.$data.hideOtherFields = false;
         // Assign data.
@@ -556,13 +602,35 @@ export default {
         this.$data.isSubmitting = false;
       }
     },
+    async fetchRepoImage() {
+      try {
+        // Clean error message.
+        this.$data.form.image.error = "";
+        // Fetch.
+        let resp = await axios.get(
+          util.githubSearchCodeApiUrl +
+            `?sort=indexed&q=extension:png+extension:jpg+extension:jpeg+extension:gif+repo:${this.form.repo.value}`,
+          {
+            headers: { Accept: "application/vnd.github.v3.json" }
+          }
+        );
+        // Assign data.
+        const repoImages =
+          resp.data && resp.data.items
+            ? resp.data.items.map(x => util.getGitHubRawUrl(x.html_url))
+            : [];
+        this.$data.repoImages = repoImages.slice(0, 100);
+      } catch (error) {
+        this.$data.form.image.error = error.message;
+      }
+    },
     async fetchBranches() {
       try {
         // Clean error message.
         this.$data.form.branch.error = "";
         // Fetch.
         let resp = await axios.get(
-          urljoin(apiRepoUrl, this.form.repo.value, "branches"),
+          urljoin(util.githubReposApiUrl, this.form.repo.value, "branches"),
           {
             headers: { Accept: "application/vnd.github.v3.json" }
           }
@@ -587,13 +655,12 @@ export default {
         this.$data.form.packageJson.error = "";
         // Fetch.
         const url = urljoin(
-          apiRepoUrl,
+          util.githubReposApiUrl,
           this.form.repo.value,
           "git/trees",
           this.form.branch.value
         );
         this.$data.form.packageJson.prompt = "Loading package.json path...";
-        console.log(`fetchGitTrees: ${url}`);
         const resp = await axios.get(url, {
           params: { recursive: 1 },
           headers: { Accept: "application/vnd.github.v3.json" }
@@ -621,13 +688,12 @@ export default {
         this.$data.form.packageJson.error = "";
         // Fetch.
         let url = urljoin(
-          apiRepoUrl,
+          util.githubReposApiUrl,
           this.form.repo.value,
           "contents",
           this.form.packageJson.value,
           "?ref=" + this.$data.form.branch.value
         );
-        console.log(`fetchPackageInfo: ${url}`);
         let resp = await axios.get(url, {
           headers: { Accept: "application/vnd.github.v3.json" }
         });
@@ -636,7 +702,7 @@ export default {
         this.$data.packageInfo = JSON.parse(content);
         let packageName = this.$data.packageInfo.name;
         if (this.$page.frontmatter.packageNames.includes(packageName))
-          throw new Error(`Package ${packageName} already exists`);
+          throw new Error(`The package ${packageName} already exists`);
         if (packageName.includes("@"))
           throw new Error(
             `Package name "${packageName}" includes character '@', that is not accepted by UPM. Please contact package owner to modify it.`
@@ -670,6 +736,25 @@ export default {
     // #select-repo-source
     //   flex 0 1
 
+    .pkg-img-columns
+      padding-top 0.6rem
+      .pkg-img-wrap
+        position relative
+        overflow hidden
+        padding-bottom 100%
+        border 2px solid white
+        &.selected
+          border-color $accentColor
+        &:hover
+          cursor pointer
+        .pkg-img
+          position  absolute
+          max-width  100%
+          max-height  100%
+          top  50%
+          left  50%
+          transform  translateX(-50%) translateY(-50%)
+
     .theme-default-content
       max-width auto
       margin 0
@@ -684,6 +769,7 @@ export default {
       .timeline-content
         ol
           list-style decimal outside
+
     .tile-title
       font-weight bold
 </style>

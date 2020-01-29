@@ -4,7 +4,6 @@ description: >-
   A bezier spline solution for Unity 3D with some utility functions (like
   travelling the spline with constant speed/time)
 repoUrl: 'https://github.com/favoyang/UnityBezierSolution-UPM'
-repoBranch: upm-convert
 parentRepoUrl: 'https://github.com/yasirkula/UnityBezierSolution'
 licenseSpdxId: MIT
 licenseName: MIT License
@@ -12,3 +11,5 @@ topics:
   - animation
   - utility
 hunter: favoyang
+createdAt: 1578066094000
+image: https://raw.githubusercontent.com/favoyang/UnityBezierSolution-UPM/890961c72616bd27e378cb0b0a42488b6ab7c7f0/Images/1.png

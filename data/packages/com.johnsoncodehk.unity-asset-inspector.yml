@@ -2,10 +2,10 @@ name: com.johnsoncodehk.unity-asset-inspector
 displayName: Asset Inspector
 description: Unity sub-asset editor
 repoUrl: 'https://github.com/johnsoncodehk/unity-asset-inspector'
-repoBranch: master
 parentRepoUrl: null
 licenseSpdxId: MIT
 licenseName: MIT License
 topics:
   - utility
 hunter: favoyang
+createdAt: 1576334942000

@@ -114,7 +114,7 @@ main
 .vuepress-flowchart
   overflow auto
 
-.avatar
+.avatar:not(.custom)
   background #eee
 
 .pkg-sm
@@ -122,3 +122,9 @@ main
     margin 0 0 0.3rem 0
     a::before
       content "📦 "
+
+.form-group
+  .form-label
+    &.required:after
+      content " *"
+      color $accentColor

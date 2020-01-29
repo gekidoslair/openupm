@@ -4,7 +4,6 @@ description: >-
   This was an attempt to replace Unity's built-in 2D physics engine with only
   the features I wanted.
 repoUrl: 'https://github.com/starikcetin/Eflatun.Tracking2D'
-repoBranch: upm
 parentRepoUrl: null
 licenseSpdxId: MIT
 licenseName: MIT License
@@ -12,3 +11,4 @@ topics:
   - 2d
   - physics
 hunter: favoyang
+createdAt: 1576236398000

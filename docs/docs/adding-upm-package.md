@@ -11,7 +11,7 @@ OpenUPM requires the package repository fulfils below criteria
 - The valid UPM structure. At least contains a `package.json` file, can be placed at a sub-folder.
 - An open source license. It is recommended to choose one from the [spdx license list](https://spdx.org/licenses/).
 - Hosting on Github. For now only GitHub repositories are supported, but the generic git support is under consideration.
-- Git tags that are valid semver, with/without the `v` prefix. i.e. `v1.1.0`, `1.1.0`, `1.1.1-preview`, `v2.0.0-preview.1`. Only valid tags are built. It is recommended to either using the GitHub release feature, or CI tools to create git tags.
+- Git tags that are valid semver, with/without the `v` prefix. i.e. `v1.1.0`, `1.1.0`, `1.1.1-preview`, `v2.0.0-preview.1`. Only valid tags are built. It is recommended to either use the [GitHub release](https://help.github.com/en/github/administering-a-repository/creating-releases) feature, or CI tools to create git tags.
 
 ## Understanding Different Folder Structures of UPM Repositories
 
@@ -46,8 +46,6 @@ displayName: Unity Package Example
 description: An unity package example
 # repository url
 repoUrl: 'https://github.com/favoyang/unity-package-example'
-# repository branch
-repoBranch: master
 # forked repository url
 parentRepoUrl: null
 # spdx license id
@@ -57,6 +55,8 @@ licenseName: MIT License
 # list of topic slugs
 topics:
   - utility
+# featured image
+image: 'https://github.com/favoyang/unity-package-example/raw/master/Assets/Plugins/UnityPackageExample/main.png'
 # package hunter name (github username)
 hunter: favoyang
 # excluded from package list
@@ -86,8 +86,14 @@ pr->ci
 
 Please create an issue on the author's repository for making GitHub releases. The git tag should be a valid semver.
 
+### Handling Failed Builds
+
+You can view the reason of failed build at build issues section of the package detail page. The most common issue is *version conflict*, means a package with with same version already exists. The package owner need bump the version with a new GitHub release, or retag the existing release. Build pipelines will rebuild a failed release if detecting that the git tag is removed or retagged.
+
+However, build pipelines will not rebuild a already succeeded release if detecting that the git tag is removed or retagged. Because it's a bad practice for talking off or replacing an existing release for a public registry. If the intention is to fix something, the packager owner is recommended to bump the version with a new git tag. For the rare case, please [create an issue](https://github.com/openupm/openupm/issues) for unpublishing.
+
 ### Handling the Custom Build Script
 
 Build pipelines simply detect the package folder, and run the `npm publish` command in that folder to publish a package. If what you want is to exclude certain files from the package bundle, you can use the `.npmigore` file at the same path of the `package.json` file. Learn more [here](https://docs.npmjs.com/misc/developers#keeping-files-out-of-your-package).
 
-The custom build script is not supported at the moment. We're looking for an example repository to work with to support the custom build script. If your package do need the feature, please [create an issue](https://github.com/openupm/openupm/issues) to start a conversation.
+The custom build script is not supported at the moment. We're looking for an candidate repository to work with to support the custom build script. If your package do need the feature, please [create an issue](https://github.com/openupm/openupm/issues) to start a conversation.

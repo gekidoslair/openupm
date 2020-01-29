@@ -5,10 +5,11 @@ description: >-
   toon-style waves from a noise texture and generates shoreline foam based off
   the depth buffer.
 repoUrl: 'https://github.com/favoyang/ToonWaterShader-UPM'
-repoBranch: master
 parentRepoUrl: 'https://github.com/IronWarrior/ToonWaterShader'
 licenseSpdxId: Unlicense
 licenseName: The Unlicense
 topics:
   - effect-shader
 hunter: favoyang
+createdAt: 1577871140000
+image: https://i.imgur.com/skPAzbz.png

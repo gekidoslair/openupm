@@ -2,10 +2,11 @@ name: com.cakeslice.outline-effect
 displayName: Outline Effect
 description: Outline Image Effect for Unity
 repoUrl: 'https://github.com/cakeslice/Outline-Effect'
-repoBranch: master
 parentRepoUrl: null
 licenseSpdxId: MIT
 licenseName: MIT License
 topics:
   - effect-shader
 hunter: favoyang
+createdAt: 1572536406000
+image: https://i.imgur.com/CuUDPyk.jpg

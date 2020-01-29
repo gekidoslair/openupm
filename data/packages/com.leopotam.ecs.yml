@@ -4,7 +4,6 @@ description: >-
   LeoECS is a fast Entity Component System (ECS) Framework powered by C# with
   optional integration to Unity
 repoUrl: 'https://github.com/Leopotam/ecs'
-repoBranch: master
 parentRepoUrl: null
 licenseSpdxId: MIT
 licenseName: MIT License
@@ -12,3 +11,4 @@ topics:
   - dots
   - framework
 hunter: favoyang
+createdAt: 1576423686000

@@ -17,7 +17,7 @@ const docSideBar = function() {
     {
       title: "Package Creator Guide",
       collapsable: false,
-      children: ["/docs/adding-badge"]
+      children: ["/docs/adding-badge", "/docs/managing-upm-project"]
     },
     {
       title: "Development Guide",
@@ -104,7 +104,7 @@ module.exports = {
     repo: "https://github.com/openupm/openupm",
     editLinks: true,
     docsDir: "docs",
-    lastUpdated: true,
+    lastUpdated: false,
     smoothScroll: true,
     logo: "/images/openupm-icon-128.png",
     nav: [
@@ -125,12 +125,16 @@ module.exports = {
         ]
       },
       {
-        text: "Blog",
-        link: "https://www.patreon.com/openupm/posts"
-      },
-      {
-        text: "Chat",
-        link: "https://discord.gg/FnUgWEP"
+        text: "Community",
+        ariaLabel: "Community Menu",
+        items: [
+          { text: "Blog on Medium", link: "https://medium.com/openupm" },
+          {
+            text: "Blog on Patreon",
+            link: "https://www.patreon.com/openupm/posts"
+          },
+          { text: "Chat", link: "https://discord.gg/FnUgWEP" }
+        ]
       },
       {
         text: "Command Line Tool",
@@ -146,6 +150,12 @@ module.exports = {
    * Apply plugins，ref：https://v1.vuepress.vuejs.org/zh/plugin/
    */
   plugins: [
+    [
+      "@vuepress/plugin-register-components",
+      {
+        componentsDir: path.resolve(__dirname, "./theme/components")
+      }
+    ],
     "@vuepress/plugin-back-to-top",
     // ["@vuepress/pwa", { serviceWorker: true, updatePopup: true }],
     "@vuepress/plugin-medium-zoom",

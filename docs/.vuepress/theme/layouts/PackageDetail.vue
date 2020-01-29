@@ -17,6 +17,11 @@
               </li>
             </ul>
           </div>
+          <div class="column col-8 col-sm-12 topics-wrap">
+            <a v-for="item in $topics" :key="item.slug" :href="item.link"
+              ><span class="label label-rounded"> {{ item.name }}</span></a
+            >
+          </div>
           <div class="column col-8 col-sm-12">
             <div class="theme-default-content">
               <div v-if="$data.readmeRaw" class="readme-wrap">
@@ -169,7 +174,7 @@
                         No tags found in <NavLink :item="tagsNavLink" />. Please
                         checkout docs
                         <a
-                          href="/docs/adding-upm-package.html#handling-repository-without-releases"
+                          href="/docs/adding-upm-package.html#handling-the-repository-without-git-tags"
                         >
                           handling repository without releases.
                         </a>
@@ -285,18 +290,10 @@ import marked from "marked";
 import { noCase } from "change-case";
 import urljoin from "url-join";
 
-import util from "@root/docs/.vuepress/util";
-import { ReleaseState, ReleaseReason } from "@root/app/models/common";
-import ParentLayout from "@theme/layouts/Layout.vue";
 import NavLink from "@parent-theme/components/NavLink.vue";
-
-const apiRepoUrl = "https://api.github.com/repos/";
-
-const apiPackageUrl = urljoin(util.apiUrl, "/packages/");
-
-const openupmCliRepoUrl = "https://github.com/openupm/openupm-cli#openupm-cli";
-
-const openupmRepoUrl = "https://github.com/openupm/openupm";
+import ParentLayout from "@theme/layouts/Layout.vue";
+import { ReleaseState, ReleaseReason } from "@root/app/models/common";
+import util from "@root/docs/.vuepress/util";
 
 const defaultData = function() {
   return {
@@ -318,6 +315,9 @@ export default {
     },
     $relatedPackages() {
       return this.$page.frontmatter.relatedPackages;
+    },
+    $topics() {
+      return this.$page.frontmatter.topics;
     },
     packageName() {
       return this.$package.displayName || this.$package.name;
@@ -471,7 +471,7 @@ export default {
     editNavLink() {
       return {
         link: urljoin(
-          openupmRepoUrl,
+          util.openupmRepoUrl,
           "/blob/master/data/packages",
           this.$package.name + ".yml"
         ),
@@ -480,7 +480,7 @@ export default {
     },
     openupmCliRepoLink() {
       return {
-        link: openupmCliRepoUrl,
+        link: util.openupmCliRepoUrl,
         text: "openupm-cli"
       };
     },
@@ -513,7 +513,7 @@ export default {
       const title = "# " + this.packageName + "\n";
       try {
         let resp = await axios.get(
-          urljoin(apiRepoUrl, this.$package.repo, "readme"),
+          urljoin(util.githubReposApiUrl, this.$package.repo, "readme"),
           { headers: { Accept: "application/vnd.github.v3.raw" } }
         );
         let readmeRaw = resp.data;
@@ -538,9 +538,12 @@ See more in the [${this.$package.repo}](${this.$package.repoUrl}) repository.
     },
     async fetchRepoInfo() {
       try {
-        let resp = await axios.get(urljoin(apiRepoUrl, this.$package.repo), {
-          headers: { Accept: "application/vnd.github.v3.json" }
-        });
+        let resp = await axios.get(
+          urljoin(util.githubReposApiUrl, this.$package.repo),
+          {
+            headers: { Accept: "application/vnd.github.v3.json" }
+          }
+        );
         this.$data.repoInfo = resp.data;
       } catch (error) {
         console.error(error);
@@ -549,7 +552,7 @@ See more in the [${this.$package.repo}](${this.$package.repoUrl}) repository.
     async fetchRepoTagsInfo() {
       try {
         let resp = await axios.get(
-          urljoin(apiRepoUrl, this.$package.repo, "tags"),
+          urljoin(util.githubReposApiUrl, this.$package.repo, "tags"),
           {
             headers: { Accept: "application/vnd.github.v3.json" }
           }
@@ -561,9 +564,12 @@ See more in the [${this.$package.repo}](${this.$package.repoUrl}) repository.
     },
     async fetchPackageInfo() {
       try {
-        let resp = await axios.get(urljoin(apiPackageUrl, this.$package.name), {
-          headers: { Accept: "application/json" }
-        });
+        let resp = await axios.get(
+          urljoin(util.openupmPackagesApiUrl, this.$package.name),
+          {
+            headers: { Accept: "application/json" }
+          }
+        );
         this.$data.packageInfo = resp.data;
       } catch (error) {
         console.error(error);
@@ -586,6 +592,12 @@ See more in the [${this.$package.repo}](${this.$package.repoUrl}) repository.
 .package-detail
   .main-container
     margin-top 1rem
+
+    .topics-wrap
+      margin-bottom 0.8rem
+      .label
+        font-size 0.7rem
+        margin-right 0.3rem
 
     .readme-wrap
       margin-bottom 2rem

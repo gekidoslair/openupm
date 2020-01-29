@@ -1,0 +1,12 @@
+name: com.ionic.zlib
+displayName: com.ionic.zlib
+description: Unity package for the Ionic.zlib library
+repoUrl: 'https://github.com/PixelWizards/com.ionic.zlib'
+parentRepoUrl: null
+licenseSpdxId: MIT
+licenseName: MIT License
+topics:
+  - utility
+hunter: PixelWizards
+gitTagIgnore: ''
+createdAt: 1578866405000

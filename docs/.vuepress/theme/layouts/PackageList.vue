@@ -24,7 +24,24 @@
               </div>
             </div>
           </div>
-          <div class="column col-3 col-sm-12">
+          <div class="column col-3 col-sm-12 meta-column">
+            <section class="sort-section">
+              <ul class="menu">
+                <li class="divider" data-content="SORT BY"></li>
+                <li
+                  v-for="item in sortOptions"
+                  :key="item.slug"
+                  class="menu-item"
+                >
+                  <a
+                    :href="item.link"
+                    :class="item.class"
+                    @click.prevent="onSortBtn(item)"
+                    >{{ item.text }}</a
+                  >
+                </li>
+              </ul>
+            </section>
             <section class="topic-section">
               <ul class="menu">
                 <li class="divider" data-content="TOPICS"></li>
@@ -36,51 +53,14 @@
           </div>
           <div class="column col-9 col-sm-12">
             <section class="package-section">
-              <div class="columns">
-                <div
-                  v-for="pkg in packages"
-                  :key="pkg.id"
-                  class="column col-6 col-md-12 tile-wrap"
-                >
-                  <div class="tile bg-gray">
-                    <div class="tile-content">
-                      <h3 class="tile-title">
-                        <NavLink :item="pkg.link" />
-                      </h3>
-                      <p class="tile-subtitle">
-                        {{ pkg.description }}
-                      </p>
-                      <div>
-                        <span class="chip">
-                          <img
-                            :src="pkg.ownerAvatarUrl"
-                            :alt="pkg.owner"
-                            class="avatar avatar-sm"
-                          />
-                          {{ pkg.owner }}
-                        </span>
-                        <span v-if="pkg.parentOwner" class="chip">
-                          <img
-                            v-if="pkg.parentOwnerAvatarUrl"
-                            :src="pkg.parentOwnerAvatarUrl"
-                            :alt="pkg.parentOwner"
-                            class="avatar avatar-sm"
-                          />
-                          <i v-else class="fa fa-user"></i>
-                          {{ pkg.parentOwner }}
-                        </span>
-                        <span class="chip">
-                          <i class="fa fa-scroll"></i>
-                          {{ pkg.licenseSpdxId || pkg.licenseName }}
-                        </span>
-                        <span v-if="pkg.parentRepoUrl" class="chip">
-                          <i class="fa fa-code-branch"></i>Fork
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+              <masonry :cols="{ default: 2, 840: 1 }" :gutter="16">
+                <div v-for="pkg in packages" :key="pkg.id">
+                  <PackageCard
+                    :item="pkg"
+                    :show-created-at="$data.sort == 'date'"
+                  />
                 </div>
-              </div>
+              </masonry>
             </section>
           </div>
         </div>
@@ -91,32 +71,23 @@
 </template>
 
 <script>
+import _ from "lodash";
 import ParentLayout from "@theme/layouts/Layout.vue";
 import NavLink from "@parent-theme/components/NavLink.vue";
+import PackageCard from "@theme/components/PackageCard.vue";
 
 export default {
-  components: { ParentLayout, NavLink },
+  components: { ParentLayout, NavLink, PackageCard },
   data() {
-    return {};
+    return {
+      sort: "date",
+      sortList: [
+        { text: "Name", slug: "name" },
+        { text: "Recently Added", slug: "date" }
+      ]
+    };
   },
   computed: {
-    packages() {
-      return this.$page.frontmatter.packages;
-    },
-    topics() {
-      return this.$page.frontmatter.topics
-        .filter(topic => topic.count > 0)
-        .map(topic => {
-          return {
-            link: topic.link,
-            text: topic.name,
-            class: topic.slug == this.topic.slug ? "active" : ""
-          };
-        });
-    },
-    topic() {
-      return this.$page.frontmatter.topic;
-    },
     addPackageLink() {
       return {
         link: "/packages/add/",
@@ -128,6 +99,58 @@ export default {
         link: "/contributors/",
         text: "Contributors"
       };
+    },
+    packages() {
+      const pkgs = this.$page.frontmatter.packages;
+      if (this.$data.sort == "date") {
+        return _.orderBy(pkgs, ["createdAt"], ["desc"]);
+      } else return pkgs;
+    },
+    sortOptions() {
+      return this.$data.sortList.map(x => {
+        return {
+          ...x,
+          link: "",
+          class: x.slug == this.$data.sort ? "active" : ""
+        };
+      });
+    },
+    topic() {
+      return this.$page.frontmatter.topic;
+    },
+    topics() {
+      return this.$page.frontmatter.topics
+        .filter(topic => topic.count > 0)
+        .map(topic => {
+          return {
+            link: topic.link,
+            text: topic.name,
+            class: topic.slug == this.topic.slug ? "active" : ""
+          };
+        });
+    }
+  },
+  watch: {
+    // eslint-disable-next-line no-unused-vars
+    $route(to, from) {
+      this.setSortOption(this.$route.query.sort);
+    }
+  },
+  mounted() {
+    this.setSortOption(this.$route.query.sort);
+  },
+  methods: {
+    onSortBtn(item) {
+      if (item.class == "active") return;
+      this.$router.push({
+        path: this.$route.path,
+        query: { sort: item.slug }
+      });
+    },
+    setSortOption() {
+      const sort = this.$route.query.sort;
+      const choices = this.$data.sortList.map(x => x.slug);
+      if (choices.includes(sort)) this.$data.sort = sort;
     }
   }
 };
@@ -144,32 +167,10 @@ export default {
     .breadcrumb-action-wrap
       padding-top 0.34rem
 
-    .topic-section
-      margin-bottom 1.5rem
+    .meta-column
+      section
+        margin-bottom 1rem
 
     .package-section
       margin-bottom 1.5rem
-
-      .tile-wrap
-        margin-bottom 0.8rem
-
-        .tile
-          padding 0.6rem 0.6rem
-          height 100%
-
-          .tile-subtitle
-            height 3.6rem
-            overflow hidden
-            text-overflow ellipsis
-
-          .chip
-            i
-              padding-right 0.3rem
-
-          h3
-            font-size 0.9rem
-            margin 0 0 0.8rem
-
-          p
-            margin 0 0 0.5rem
 </style>
