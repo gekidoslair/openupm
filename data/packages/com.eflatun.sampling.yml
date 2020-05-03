@@ -6,6 +6,9 @@ parentRepoUrl: null
 licenseSpdxId: MIT
 licenseName: MIT License
 topics:
-  - utility
-hunter: favoyang
-createdAt: 1576332038000
+  - utilities
+hunter: starikcetin
+gitTagPrefix: ''
+gitTagIgnore: ''
+image: null
+createdAt: 1582569752011

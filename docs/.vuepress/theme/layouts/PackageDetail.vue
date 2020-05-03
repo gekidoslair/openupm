@@ -69,7 +69,6 @@
                   <a
                     v-if="parentOwnerNavLink"
                     :href="parentOwnerNavLink.link"
-                    target="_blank"
                     rel="noopener noreferrer"
                     class="nav-link external"
                   >
@@ -86,7 +85,6 @@
                   </a>
                   <a
                     :href="ownerNavLink.link"
-                    target="_blank"
                     rel="noopener noreferrer"
                     class="nav-link external"
                   >
@@ -105,7 +103,6 @@
                   <a
                     v-if="$package.hunterUrl"
                     :href="hunterNavLink.link"
-                    target="_blank"
                     rel="noopener noreferrer"
                     class="nav-link external"
                   >
@@ -135,28 +132,56 @@
                 </section>
                 <section class="col-6 col-sm-12">
                   <h2>Version</h2>
-                  <span>{{ packageVersion }}</span>
+                  <span>{{ packageVersion || "-" }}</span>
+                </section>
+                <section class="col-6 col-sm-12">
+                  <h2>Unity Version</h2>
+                  <span>{{ packageUnityVersion || "-" }}</span>
                 </section>
                 <section class="col-6 col-sm-12">
                   <h2>Published</h2>
-                  <span>{{ packagePublishedAt }}</span>
+                  <span>{{ packagePublishedAt || "-" }}</span>
+                </section>
+                <section class="col-6 col-sm-12"></section>
+                <section v-if="!noTagsFound" class="col-12">
+                  <h2>Dependencies ({{ dependencies.length }})</h2>
+                  <div v-if="dependencies.length" class="container">
+                    <ul class="section-list">
+                      <li
+                        v-for="entry in dependencies"
+                        :key="entry.name"
+                        class="columns"
+                      >
+                        <div class="col-12">
+                          <i class=""></i>
+                          <NavLink v-if="entry.link" :item="entry.link" />
+                          <span v-else>{{ entry.name }}</span>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                  <span v-else>-</span>
                 </section>
                 <section v-if="!noTagsFound" class="col-12">
                   <h2>Version history</h2>
                   <div class="container">
-                    <ul class="build-history">
+                    <ul class="section-list">
                       <li
-                        v-for="build in packageSucceededBuilds"
-                        :key="build.id"
+                        v-for="entry in packageVersions"
+                        :key="entry.version"
                         class="columns"
                       >
                         <div class="col-6">
-                          <i :class="build.class"></i>
-                          <span>{{ build.build.version }}</span>
+                          <i :class="entry.class"></i>
+                          <span
+                            class="tooltip"
+                            :data-tooltip="'Unity version: ' + entry.unity"
+                            >{{ entry.version }}</span
+                          >
                         </div>
                         <div class="col-6">
                           <span>
-                            {{ build.timeSince }}
+                            {{ entry.timeSince }}
                           </span>
                         </div>
                       </li>
@@ -171,10 +196,9 @@
                   <div v-if="noTagsFound" class="toast">
                     <p>
                       <span>
-                        No tags found in <NavLink :item="tagsNavLink" />. Please
-                        checkout docs
+                        No git tag found in <NavLink :item="tagsNavLink" />. See
                         <a
-                          href="/docs/adding-upm-package.html#handling-the-repository-without-git-tags"
+                          href="/docs/adding-upm-package.html#handling-a-repository-without-git-tag"
                         >
                           handling repository without releases.
                         </a>
@@ -182,7 +206,7 @@
                     </p>
                   </div>
                   <div class="container">
-                    <ul class="build-history">
+                    <ul class="section-list">
                       <li
                         v-for="build in packageNotSucceededBuilds"
                         :key="build.id"
@@ -190,13 +214,12 @@
                       >
                         <div class="col-6">
                           <i :class="build.class"></i>
-                          <span>{{ build.id }}</span>
+                          <span>{{ build.tag }}</span>
                         </div>
                         <div class="col-6">
                           <a
                             v-if="build.build.buildId"
                             :href="build.buildUrl"
-                            target="_blank"
                             build="noopener noreferrer"
                           >
                             <span>
@@ -290,7 +313,7 @@ import marked from "marked";
 import { noCase } from "change-case";
 import urljoin from "url-join";
 
-import NavLink from "@parent-theme/components/NavLink.vue";
+import NavLink from "@theme/components/NavLink.vue";
 import ParentLayout from "@theme/layouts/Layout.vue";
 import { ReleaseState, ReleaseReason } from "@root/app/models/common";
 import util from "@root/docs/.vuepress/util";
@@ -300,6 +323,7 @@ const defaultData = function() {
     readmeRaw: "",
     repoInfo: {},
     packageInfo: {},
+    registryInfo: {},
     noTagsFound: false
   };
 };
@@ -310,6 +334,21 @@ export default {
     return defaultData();
   },
   computed: {
+    dependencies() {
+      const versions = this.registryInfo.versions || {};
+      const entry = versions[this.packageVersion];
+      if (!entry || !entry.dependencies) return [];
+      else
+        return Object.entries(entry.dependencies).map(([name, version]) => {
+          const nameWithVersion = `${name}@${version}`;
+          const url = util.getPackageUrl(this.$site.pages, name);
+          return {
+            name: nameWithVersion,
+            link: url ? { link: url, text: nameWithVersion } : null,
+            version
+          };
+        });
+    },
     $package() {
       return this.$page.frontmatter.package;
     },
@@ -323,25 +362,24 @@ export default {
       return this.$package.displayName || this.$package.name;
     },
     packageVersion() {
-      return this.packageCurrentBuild
-        ? this.packageCurrentBuild.build.version
-        : "-";
+      const distTags = this.registryInfo["dist-tags"];
+      if (distTags && distTags.latest) return distTags.latest;
+      else return null;
     },
     packagePublishedAt() {
-      return this.packageCurrentBuild
-        ? this.packageCurrentBuild.timeSince
-        : "-";
+      const time = this.registryInfo.time || {};
+      const dateTimeStr = time[this.packageVersion];
+      if (!dateTimeStr) return null;
+      return this.getTimeSince(dateTimeStr);
+    },
+    packageUnityVersion() {
+      const versions = this.registryInfo.versions || {};
+      const entry = versions[this.packageVersion];
+      if (!entry) return null;
+      return entry.unity;
     },
     packageBuilds() {
       let builds = this.$data.packageInfo.releases;
-      const getTimeSince = function(epochTime) {
-        try {
-          const date = new Date(epochTime);
-          return util.timeAgoFormat(date);
-        } catch (error) {
-          return "";
-        }
-      };
       if (builds && builds.length) {
         let objs = [];
         for (let build of builds) {
@@ -349,11 +387,12 @@ export default {
             id: build.version,
             build,
             class: "",
+            tag: build.tag,
             text: "",
             state: ReleaseState.get(build.state),
             reason: ReleaseReason.get(build.reason),
             buildUrl: util.getAzureWebBuildUrl(build.buildId),
-            timeSince: getTimeSince(build.updatedAt)
+            timeSince: this.getTimeSince(build.updatedAt)
           };
           if (obj.state == ReleaseState.Pending) {
             obj.class = "fa fa-clock-o";
@@ -375,15 +414,21 @@ export default {
       }
       return [];
     },
-    packageSucceededBuilds() {
-      return this.packageBuilds.filter(x => x.state == ReleaseState.Succeeded);
+    packageVersions() {
+      const versions = this.registryInfo.versions || {};
+      const times = this.registryInfo.time;
+      const versionKeys = Object.keys(versions).reverse();
+      return versionKeys.map(x => {
+        return {
+          version: x,
+          class: "fa fa-check-circle text-success",
+          unity: versions[x].unity,
+          timeSince: this.getTimeSince(times[x])
+        };
+      });
     },
     packageNotSucceededBuilds() {
       return this.packageBuilds.filter(x => x.state != ReleaseState.Succeeded);
-    },
-    packageCurrentBuild() {
-      const builds = this.packageSucceededBuilds;
-      return builds.length ? builds[0] : null;
     },
     packageInvalidTags() {
       return this.$data.packageInfo.invalidTags || [];
@@ -407,7 +452,7 @@ export default {
     },
     packageInstallCli() {
       const name = this.$package.name;
-      if (this.packageSucceededBuilds.length) return `openupm add ${name}`;
+      if (this.packageVersions.length) return `openupm add ${name}`;
       else return "not available yet";
     },
     badgeVersionHtml() {
@@ -503,33 +548,27 @@ export default {
   },
   methods: {
     onStart() {
-      this.fetchRepoReadme();
       this.fetchRepoInfo();
       this.fetchRepoTagsInfo();
       this.fetchPackageInfo();
+      this.fetchRegistryInfo();
     },
-    async fetchRepoReadme() {
-      // Fetch repo readme.
-      const title = "# " + this.packageName + "\n";
-      try {
-        let resp = await axios.get(
-          urljoin(util.githubReposApiUrl, this.$package.repo, "readme"),
-          { headers: { Accept: "application/vnd.github.v3.raw" } }
-        );
-        let readmeRaw = resp.data;
+    handleRepoReadme() {
+      const titleLine = "# " + this.packageName + "\n";
+      let readmeRaw = this.packageInfo.readme;
+      if (readmeRaw) {
         // Insert h1 if need.
         if (
           !/^# /m.test(readmeRaw) &&
           !/^===/m.test(readmeRaw) &&
           !/^<h1/m.test(readmeRaw)
         ) {
-          readmeRaw = title + readmeRaw;
+          readmeRaw = titleLine + readmeRaw;
         }
         this.$data.readmeRaw = readmeRaw;
-      } catch (error) {
-        console.error(error);
+      } else {
         // Rollback to default readme.
-        this.$data.readmeRaw = `${title}
+        this.$data.readmeRaw = `${titleLine}
 ${this.$package.description}
 
 See more in the [${this.$package.repo}](${this.$package.repoUrl}) repository.
@@ -573,6 +612,28 @@ See more in the [${this.$package.repo}](${this.$package.repoUrl}) repository.
         this.$data.packageInfo = resp.data;
       } catch (error) {
         console.error(error);
+      }
+      this.handleRepoReadme();
+    },
+    async fetchRegistryInfo() {
+      try {
+        let resp = await axios.get(
+          urljoin(util.openupmRegistryUrl, this.$package.name),
+          {
+            headers: { Accept: "application/json" }
+          }
+        );
+        this.$data.registryInfo = resp.data;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    getTimeSince(epochOrDateTimeStr) {
+      try {
+        const date = new Date(epochOrDateTimeStr);
+        return util.timeAgoFormat(date);
+      } catch (error) {
+        return "";
       }
     },
     onCopyCli() {
@@ -634,8 +695,8 @@ See more in the [${this.$package.repo}](${this.$package.repoUrl}) repository.
         padding-bottom 0.5rem
         margin-bottom 0.7rem
 
-      ul.build-history
-        margin 0;
+      ul.section-list
+        margin 0
         list-style none
 
       .install-cli

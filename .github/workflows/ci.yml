@@ -34,7 +34,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Release
-      uses: cycjimmy/semantic-release-action@v2.1.3
+      uses: cycjimmy/semantic-release-action@v2
       with:
         extra_plugins: |
           @semantic-release/changelog
@@ -81,3 +81,4 @@ jobs:
             yarn
             git log -m --name-only -1 --pretty="format:" --first-parent master | grep -sqE '^app|^config' && pm2 reload queue-main || echo skip pm2 queue-main reload
             git log -m --name-only -1 --pretty="format:" --first-parent master | grep -sqE '^app|^config|^data' && pm2 reload pkg-build || echo skip pm2 pkg-build reload
+            git log -m --name-only -1 --pretty="format:" --first-parent master | grep -sqE '^data' && pm2 reload pkg-extra || echo skip pm2 pkg-extra reload

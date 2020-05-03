@@ -8,7 +8,9 @@ parentRepoUrl: 'https://github.com/EcsRx/ecsrx.unity'
 licenseSpdxId: MIT
 licenseName: MIT License
 topics:
-  - dots
-  - framework
-hunter: favoyang
-createdAt: 1576335427000
+  - utilities
+hunter: starikcetin
+gitTagPrefix: ''
+gitTagIgnore: ''
+image: null
+createdAt: 1582567717322

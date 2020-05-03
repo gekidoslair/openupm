@@ -21,6 +21,7 @@
               >
                 <NavLink :item="contributorLink" class="btn" />
                 <NavLink :item="addPackageLink" class="btn btn-primary" />
+                <PackageControl class="hide-sm" />
               </div>
             </div>
           </div>
@@ -28,39 +29,85 @@
             <section class="sort-section">
               <ul class="menu">
                 <li class="divider" data-content="SORT BY"></li>
-                <li
-                  v-for="item in sortOptions"
-                  :key="item.slug"
-                  class="menu-item"
-                >
-                  <a
-                    :href="item.link"
-                    :class="item.class"
-                    @click.prevent="onSortBtn(item)"
-                    >{{ item.text }}</a
+                <div class="columns">
+                  <div
+                    v-for="item in sortOptions"
+                    :key="item.slug"
+                    class="column col-12 col-sm-6"
                   >
-                </li>
+                    <li class="menu-item">
+                      <a
+                        :href="item.link"
+                        :class="item.class"
+                        @click.prevent="onSortBtn(item)"
+                        >{{ item.text }}</a
+                      >
+                    </li>
+                  </div>
+                </div>
               </ul>
             </section>
             <section class="topic-section">
               <ul class="menu">
                 <li class="divider" data-content="TOPICS"></li>
-                <li v-for="item in topics" :key="item.slug" class="menu-item">
-                  <NavLink :item="item" :class="item.class" />
-                </li>
+                <div class="columns">
+                  <div
+                    v-for="item in topics"
+                    :key="item.slug"
+                    class="column col-12 col-sm-6"
+                  >
+                    <li class="menu-item">
+                      <RouterLink
+                        :class="['nav-link', item.class]"
+                        :to="{ path: item.link, query }"
+                        :exact="false"
+                      >
+                        {{ item.text }}
+                      </RouterLink>
+                    </li>
+                  </div>
+                </div>
+              </ul>
+            </section>
+            <section class="unity-section">
+              <ul class="menu">
+                <li class="divider" data-content="Unity Version"></li>
+                <div class="columns">
+                  <div
+                    v-for="item in unityOptions"
+                    :key="item.slug"
+                    class="column col-12 col-sm-6"
+                  >
+                    <li class="menu-item">
+                      <a
+                        :href="item.link"
+                        :class="item.class"
+                        @click.prevent="onUnityBtn(item)"
+                        >{{ item.text }}</a
+                      >
+                    </li>
+                  </div>
+                </div>
               </ul>
             </section>
           </div>
           <div class="column col-9 col-sm-12">
             <section class="package-section">
-              <masonry :cols="{ default: 2, 840: 1 }" :gutter="16">
-                <div v-for="pkg in packages" :key="pkg.id">
+              <div class="columns">
+                <div
+                  v-for="pkg in packages"
+                  :key="pkg.id"
+                  :class="[
+                    'column',
+                    preferHorizontalLayout ? 'col-12' : 'col-6 col-sm-12'
+                  ]"
+                >
                   <PackageCard
                     :item="pkg"
-                    :show-created-at="$data.sort == 'date'"
+                    :prefer-horizontal-layout="preferHorizontalLayout"
                   />
                 </div>
-              </masonry>
+              </div>
             </section>
           </div>
         </div>
@@ -73,18 +120,22 @@
 <script>
 import _ from "lodash";
 import ParentLayout from "@theme/layouts/Layout.vue";
-import NavLink from "@parent-theme/components/NavLink.vue";
+import NavLink from "@theme/components/NavLink.vue";
 import PackageCard from "@theme/components/PackageCard.vue";
+import PackageControl from "@theme/components/PackageControl.vue";
+import util from "@root/docs/.vuepress/util";
 
 export default {
-  components: { ParentLayout, NavLink, PackageCard },
+  components: { ParentLayout, NavLink, PackageCard, PackageControl },
   data() {
     return {
-      sort: "date",
+      sort: "time",
       sortList: [
         { text: "Name", slug: "name" },
-        { text: "Recently Added", slug: "date" }
-      ]
+        { text: "Popularity", slug: "pop" },
+        { text: "Recently Updated", slug: "time" }
+      ],
+      unity: ""
     };
   },
   computed: {
@@ -100,18 +151,38 @@ export default {
         text: "Contributors"
       };
     },
+    packagesExtra() {
+      return this.$store.getters.packagesExtra;
+    },
     packages() {
-      const pkgs = this.$page.frontmatter.packages;
-      if (this.$data.sort == "date") {
-        return _.orderBy(pkgs, ["createdAt"], ["desc"]);
-      } else return pkgs;
+      // Join extra data
+      let pkgs = this.$page.frontmatter.packages.map(x => {
+        return util.joinPackageExtra(x, this.packagesExtra[x.name] || {});
+      });
+      // Filter by unity
+      if (this.unity) pkgs = pkgs.filter(x => x.unity == this.unity);
+      // Sort
+      if (this.sort == "time") pkgs = _.orderBy(pkgs, ["time"], ["desc"]);
+      else if (this.sort == "pop") pkgs = _.orderBy(pkgs, ["stars"], ["desc"]);
+      else if (this.sort == "name")
+        pkgs = _.orderBy(pkgs, ["sortName"], ["asc"]);
+      return pkgs;
+    },
+    preferHorizontalLayout() {
+      return this.$store.getters.preferHorizontalLayout;
+    },
+    query() {
+      const query = {};
+      if (this.sort) query.sort = this.sort;
+      if (this.unity) query.untiy = this.unity;
+      return query;
     },
     sortOptions() {
-      return this.$data.sortList.map(x => {
+      return this.sortList.map(x => {
         return {
           ...x,
           link: "",
-          class: x.slug == this.$data.sort ? "active" : ""
+          class: x.slug == this.sort ? "active" : ""
         };
       });
     },
@@ -128,29 +199,69 @@ export default {
             class: topic.slug == this.topic.slug ? "active" : ""
           };
         });
+    },
+    unityOptions() {
+      let unityList = Object.entries(this.packagesExtra).map(
+        // eslint-disable-next-line no-unused-vars
+        ([key, value]) => _.trim(value.unity)
+      );
+      unityList = _.reverse(
+        _.uniq(unityList)
+          // Remove empty element.
+          .filter(x => x)
+          // Sort.
+          .sort()
+      );
+      // Insert "" at the beginning.
+      unityList.splice(0, 0, "");
+      // Convert to an option list.
+      return unityList.map(x => {
+        return {
+          slug: x,
+          text: x ? x : "All",
+          link: "",
+          class: x == this.unity ? "active" : ""
+        };
+      });
     }
   },
   watch: {
     // eslint-disable-next-line no-unused-vars
     $route(to, from) {
       this.setSortOption(this.$route.query.sort);
+      this.setUnityOption(this.$route.query.unity);
     }
   },
   mounted() {
     this.setSortOption(this.$route.query.sort);
+    this.setUnityOption(this.$route.query.unity);
   },
   methods: {
     onSortBtn(item) {
       if (item.class == "active") return;
+      this.sort = item.slug;
       this.$router.push({
         path: this.$route.path,
-        query: { sort: item.slug }
+        query: this.query
+      });
+    },
+    onUnityBtn(item) {
+      if (item.class == "active") return;
+      this.unity = item.slug;
+      this.$router.push({
+        path: this.$route.path,
+        query: this.query
       });
     },
     setSortOption() {
       const sort = this.$route.query.sort;
-      const choices = this.$data.sortList.map(x => x.slug);
-      if (choices.includes(sort)) this.$data.sort = sort;
+      const choices = this.sortList.map(x => x.slug);
+      if (choices.includes(sort)) this.sort = sort;
+    },
+    setUnityOption() {
+      const unity = this.$route.query.unity;
+      const choices = this.unityOptions.map(x => x.slug);
+      if (choices.includes(unity)) this.unity = unity;
     }
   }
 };

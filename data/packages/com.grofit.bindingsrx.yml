@@ -6,6 +6,9 @@ parentRepoUrl: 'https://github.com/grofit/bindingsrx'
 licenseSpdxId: MIT
 licenseName: MIT License
 topics:
-  - framework
-hunter: favoyang
-createdAt: 1576335485000
+  - utilities
+hunter: starikcetin
+gitTagPrefix: ''
+gitTagIgnore: ''
+image: null
+createdAt: 1582570769879

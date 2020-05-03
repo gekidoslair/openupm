@@ -1,4 +1,5 @@
 ---
+ads: true
 layout: Home
 pageClass: homepage
 title: Open Source Unity Package Registry (UPM)
@@ -10,7 +11,7 @@ features:
   details: Hosting community selective open source UPM packages
 - title: Continuous Publishing
   details: Package publishing automation based on git tags
-- title: Command Line Tool
+- title: Command-Line Tool
   details: <a href="https://github.com/openupm/openupm-cli">OpenUPM-CLI</a> for 3rd-party UPM registries
 noGlobalSocialShare: true
 ---
@@ -44,18 +45,9 @@ manifest updated, please open unity project to apply changes
 openupm-cli requires [Node.js 12](https://nodejs.org/en/)
 :::
 
-<h3 id="recent-packages">
-  <a href="#recent-packages" aria-hidden="true" class="header-anchor">#</a>
-  Recent Packages
-  <a href="/packages/" class="btn btn-sm btn-show-more">Show more</a>
-</h3>
-
-<PackageRecent :count="6" />
+<ClientOnly><PackageRecent :count="6" /></ClientOnly>
 
 <social-share />
 
 <style lang="stylus">
-.homepage
-  .btn-show-more
-    margin-left 0.5rem
 </style>

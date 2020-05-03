@@ -7,8 +7,9 @@ licenseSpdxId: MIT
 licenseName: MIT License
 topics:
   - 2d
-  - dots
-  - utility
+  - dots-and-ecs
+  - utilities
+  - procedural-generation
 hunter: sasvdw
 gitTagIgnore: ''
 image: null

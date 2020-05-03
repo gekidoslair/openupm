@@ -17,7 +17,7 @@ const packagesDir = path.resolve(dataDir, "packages");
 const loadTopics = async function() {
   try {
     let absPath = path.resolve(dataDir, "topics.yml");
-    return yaml.safeLoad(await readFile(absPath, "utf8"));
+    return yaml.safeLoad(await readFile(absPath, "utf8")).topics;
   } catch (e) {
     console.error(e);
     return [];
@@ -53,6 +53,17 @@ const loadPackageNames = async function() {
   return files
     .filter(p => (p.match(/.*\.(ya?ml)$/) || [])[1] !== undefined)
     .map(p => p.replace(/\.ya?ml$/, ""));
+};
+
+// Load built-in package names.
+const loadBuiltinPackageNames = async function() {
+  try {
+    let absPath = path.resolve(dataDir, "builtin.yml");
+    return yaml.safeLoad(await readFile(absPath, "utf8")).packages;
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
 };
 
 // Verify package name.
@@ -124,5 +135,6 @@ module.exports = {
   loadPackage,
   loadPackageSync,
   loadPackageNames,
+  loadBuiltinPackageNames,
   packageExists
 };

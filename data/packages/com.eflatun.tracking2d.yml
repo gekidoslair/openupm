@@ -8,7 +8,9 @@ parentRepoUrl: null
 licenseSpdxId: MIT
 licenseName: MIT License
 topics:
-  - 2d
-  - physics
-hunter: favoyang
-createdAt: 1576236398000
+  - utilities
+hunter: starikcetin
+gitTagPrefix: ''
+gitTagIgnore: ''
+image: null
+createdAt: 1582569957363

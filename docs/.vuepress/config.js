@@ -97,7 +97,17 @@ module.exports = {
         content: "/images/openupm-icon-256.png"
       }
     ],
-    ["meta", { name: "msapplication-TileColor", content: "#000000" }]
+    ["meta", { name: "msapplication-TileColor", content: "#000000" }],
+    // Google AdSense
+    [
+      "script",
+      { src: "//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js" }
+    ],
+    [
+      "script",
+      {},
+      '(adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"ca-pub-7925911236569822",enable_page_level_ads:true});'
+    ]
   ],
   themeConfig: {
     domain: "https://openupm.com",
@@ -129,16 +139,13 @@ module.exports = {
         ariaLabel: "Community Menu",
         items: [
           { text: "Blog on Medium", link: "https://medium.com/openupm" },
-          {
-            text: "Blog on Patreon",
-            link: "https://www.patreon.com/openupm/posts"
-          },
           { text: "Chat", link: "https://discord.gg/FnUgWEP" }
         ]
       },
       {
-        text: "Command Line Tool",
-        link: "https://github.com/openupm/openupm-cli#openupm-cli"
+        text: "Command-Line Tool",
+        link: "https://github.com/openupm/openupm-cli#openupm-cli",
+        icon: "fa fa-keyboard"
       }
     ],
     sidebar: {

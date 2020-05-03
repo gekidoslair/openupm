@@ -13,7 +13,7 @@ const {
 const { queues, addJob } = require("../queues/core");
 const { cleanRepoUrl, loadPackage } = require("../utils/package");
 const { gitListRemoteTags } = require("../utils/git");
-const { semverRe, getVersionFromTag } = require("../utils/semver");
+const { getVersionFromTag } = require("../utils/semver");
 const logger = require("../utils/log")(module);
 const { removeRelease } = require("./removeRelease");
 
@@ -25,7 +25,11 @@ const buildPackage = async function(name) {
   // Get remote tags.
   logger.debug({ pkg: name }, "get remote tags");
   let remoteTags = await gitListRemoteTags(cleanRepoUrl(pkg.repoUrl, "git"));
-  let validTags = filterRemoteTags(remoteTags, pkg.gitTagIgnore);
+  let validTags = filterRemoteTags({
+    remoteTags,
+    gitTagIgnore: pkg.gitTagIgnore,
+    gitTagPrefix: pkg.gitTagPrefix
+  });
   validTags.reverse();
   let invalidTags = difference(remoteTags, validTags);
   await PackageExtra.setInvalidTags(name, invalidTags);
@@ -42,30 +46,30 @@ const buildPackage = async function(name) {
 };
 
 // Filter remote tags for non-semver, duplication and ignoration.
-const filterRemoteTags = function(remoteTags, gitTagIgnore) {
-  // Filter out non-semver
-  let tags = remoteTags.filter(x => {
-    const segs = x.tag.split("/");
-    const tag = segs.length ? segs[segs.length - 1] : x.tag;
-    return semverRe.test(tag);
-  });
-  // Filter out ignoration
+const filterRemoteTags = function({ remoteTags, gitTagIgnore, gitTagPrefix }) {
+  let tags = remoteTags;
+  // Filter prefix based on raw tag
+  if (gitTagPrefix) tags = tags.filter(x => x.tag.startsWith(gitTagPrefix));
+  // Filter out non-semver based on parsed version
+  tags = tags.filter(x => getVersionFromTag(x.tag) != null);
+  // Filter out ignoration based on raw tag
   if (gitTagIgnore) {
     const ignoreRe = new RegExp(gitTagIgnore, "i");
     tags = tags.filter(x => !ignoreRe.test(x.tag));
   }
-  // Filter out duplications
-  // If tag "x.y.z" and "vx.y.z" both exist, keep the first one.
-  let versionSet = new Set();
-  let cleanTags = [];
+  // Tags with "upm/" prefix or "-upm" suffix are valid.
+  const upmRe = /(^upm\/|(_|-)upm$)/i;
+  const validTags = tags.filter(x => upmRe.test(x.tag));
+  const versionSet = new Set(validTags.map(x => getVersionFromTag(x.tag)));
+  // Remove duplications
   for (const element of tags) {
-    let version = getVersionFromTag(element.tag);
+    const version = getVersionFromTag(element.tag);
     if (!versionSet.has(version)) {
       versionSet.add(version);
-      cleanTags.push(element);
+      validTags.push(element);
     }
   }
-  return cleanTags;
+  return validTags;
 };
 
 // Update release records for given remoteTags.

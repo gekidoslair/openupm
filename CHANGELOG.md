@@ -1,3 +1,244 @@
+# [1.21.0](https://github.com/openupm/openupm/compare/1.20.5...1.21.0) (2020-05-02)
+
+
+### Features
+
+* **website:** one-column for package lister view (refs: [#227](https://github.com/openupm/openupm/issues/227)) ([87e417a](https://github.com/openupm/openupm/commit/87e417a91197e0e9c28fae777ac01d62cb900a86))
+
+## [1.20.5](https://github.com/openupm/openupm/compare/1.20.4...1.20.5) (2020-05-01)
+
+
+### Bug Fixes
+
+* **website:** two-column filter for lister pages on mobile ([de75322](https://github.com/openupm/openupm/commit/de753227f6d10bad7727a682d05c73b9675e8c45))
+
+## [1.20.4](https://github.com/openupm/openupm/compare/1.20.3...1.20.4) (2020-05-01)
+
+
+### Bug Fixes
+
+* **website:** remove duplicated unity version option on the package list page ([fba21cb](https://github.com/openupm/openupm/commit/fba21cb513fcd7f954db30c731dd8d86f7247e62))
+
+## [1.20.3](https://github.com/openupm/openupm/compare/1.20.2...1.20.3) (2020-05-01)
+
+
+### Bug Fixes
+
+* **website:** remove masonry layout for package cards (refs: [#227](https://github.com/openupm/openupm/issues/227)) ([a51bfe9](https://github.com/openupm/openupm/commit/a51bfe9a882e1b12335331861c029847c755bb16))
+
+## [1.20.2](https://github.com/openupm/openupm/compare/1.20.1...1.20.2) (2020-04-29)
+
+
+### Bug Fixes
+
+* **website:** avoid link with target=_blank (close: [#228](https://github.com/openupm/openupm/issues/228)) ([a540e61](https://github.com/openupm/openupm/commit/a540e619e748e047230ee5d56bc2b05c4cb5cd26))
+
+## [1.20.1](https://github.com/openupm/openupm/compare/1.20.0...1.20.1) (2020-04-29)
+
+
+### Bug Fixes
+
+* **website:** feed redirect rules. ([e462a14](https://github.com/openupm/openupm/commit/e462a1481905ffcf5e6a4ee8f5671b9fa5fa3969))
+
+# [1.20.0](https://github.com/openupm/openupm/compare/1.19.1...1.20.0) (2020-04-29)
+
+
+### Features
+
+* package update feed (refs [#48](https://github.com/openupm/openupm/issues/48)) ([32b4991](https://github.com/openupm/openupm/commit/32b49918406b0a3fdbe95ab994b564468c7839ac))
+
+## [1.19.1](https://github.com/openupm/openupm/compare/1.19.0...1.19.1) (2020-04-26)
+
+
+### Bug Fixes
+
+* **pipelines:** support underscore prefix ([0e9865f](https://github.com/openupm/openupm/commit/0e9865f1c0ab1048341285f3892ed5291bb0ad89))
+
+# [1.19.0](https://github.com/openupm/openupm/compare/1.18.5...1.19.0) (2020-04-23)
+
+
+### Bug Fixes
+
+* **website:** duplicated unity list ([ad065e5](https://github.com/openupm/openupm/commit/ad065e5672348d379ac10c1c36b2e28d4c871b99))
+
+
+### Features
+
+* **website:** sort package by last update time ([b35d77a](https://github.com/openupm/openupm/commit/b35d77aa3116ad1a3c117947dd0b484088e72454))
+
+## [1.18.5](https://github.com/openupm/openupm/compare/1.18.4...1.18.5) (2020-04-02)
+
+
+### Bug Fixes
+
+* treat ReleaseReason.None as a retryable reason (close: [#137](https://github.com/openupm/openupm/issues/137)) ([9b372a2](https://github.com/openupm/openupm/commit/9b372a252a46b3409be4bdfb170fd73c824093cb))
+
+## [1.18.4](https://github.com/openupm/openupm/compare/1.18.3...1.18.4) (2020-03-31)
+
+
+### Bug Fixes
+
+* **website:** package card title overflow-wrap ([d660a43](https://github.com/openupm/openupm/commit/d660a43b9143648b7c7bf933bec911c176e7f4a7))
+
+## [1.18.3](https://github.com/openupm/openupm/compare/1.18.2...1.18.3) (2020-03-18)
+
+
+### Bug Fixes
+
+* edge case when parsing readme image path (close: [#120](https://github.com/openupm/openupm/issues/120)) ([dde1e10](https://github.com/openupm/openupm/commit/dde1e108104a8697452aff2e4a4886aef2818a68))
+
+## [1.18.2](https://github.com/openupm/openupm/compare/1.18.1...1.18.2) (2020-03-10)
+
+
+### Bug Fixes
+
+* **web:** recent packages shall respect excludedFromList property ([48856d9](https://github.com/openupm/openupm/commit/48856d9d5ad3970ab1638d07d6cb052d6896a996))
+
+## [1.18.1](https://github.com/openupm/openupm/compare/1.18.0...1.18.1) (2020-02-26)
+
+
+### Bug Fixes
+
+* **pipelines:** the passed gitTagPrefix is incorrect ([08c5b59](https://github.com/openupm/openupm/commit/08c5b59472e3e85d184642fe6e8dc29657cafda4))
+
+# [1.18.0](https://github.com/openupm/openupm/compare/1.17.1...1.18.0) (2020-02-22)
+
+
+### Features
+
+* **pipelines:** add gitTagPrefix field to filter git tags (close: [#69](https://github.com/openupm/openupm/issues/69)) ([bf82be8](https://github.com/openupm/openupm/commit/bf82be893eb284b3fb898fa0ff3ad487bd8166e9))
+
+## [1.17.1](https://github.com/openupm/openupm/compare/1.17.0...1.17.1) (2020-02-12)
+
+
+### Bug Fixes
+
+* **cli:** queue:status ignores stallBlock ([bf955a2](https://github.com/openupm/openupm/commit/bf955a25d12701cb77a5f7da2f8caaea1bc2ca8d))
+
+# [1.17.0](https://github.com/openupm/openupm/compare/1.16.0...1.17.0) (2020-02-12)
+
+
+### Features
+
+* **cli:** add queue:status command ([b05537b](https://github.com/openupm/openupm/commit/b05537bd2a340eb14d48695e6557209cdbf21093))
+
+# [1.16.0](https://github.com/openupm/openupm/compare/1.15.1...1.16.0) (2020-02-11)
+
+
+### Features
+
+* **website:** [#53](https://github.com/openupm/openupm/issues/53) filter package list by supported Unity version ([716e322](https://github.com/openupm/openupm/commit/716e32296c2ca6def4aebaf895a999ea680b35a3))
+
+## [1.15.1](https://github.com/openupm/openupm/compare/1.15.0...1.15.1) (2020-02-11)
+
+
+### Bug Fixes
+
+* **pipelines:** add GitHub token for pkg:fetch-extra command ([fed3a62](https://github.com/openupm/openupm/commit/fed3a626f05e016979e7d9c450baa1ec39c8df8f))
+
+# [1.15.0](https://github.com/openupm/openupm/compare/1.14.0...1.15.0) (2020-02-10)
+
+
+### Bug Fixes
+
+* **website:** topic link missing active class ([28f176a](https://github.com/openupm/openupm/commit/28f176ae82891010f5e92cfa33d4ae9bde51a7b4))
+
+
+### Features
+
+* **ci:** reload pkg-extra process ([ea7b23f](https://github.com/openupm/openupm/commit/ea7b23f97e5465e9ac9421fdeea16bbc9a39ed79))
+
+# [1.14.0](https://github.com/openupm/openupm/compare/1.13.3...1.14.0) (2020-02-10)
+
+
+### Features
+
+* **api:** add /packages/extra endpoint ([3ee2bbb](https://github.com/openupm/openupm/commit/3ee2bbbd9419a110a5b726657ce266fb81cfac69))
+* **cli:** add script to fetch package extra data ([cd957a9](https://github.com/openupm/openupm/commit/cd957a9ce5fd1f54649153e9df48bed8dfd99598))
+* **website:** sort by popularity ([a7ac402](https://github.com/openupm/openupm/commit/a7ac4022a20c9ddcdd9692284cc04e7915ec11dd))
+
+## [1.13.3](https://github.com/openupm/openupm/compare/1.13.2...1.13.3) (2020-02-10)
+
+
+### Bug Fixes
+
+* **website:** show git tag on build issues of package detail page ([2b8bd5a](https://github.com/openupm/openupm/commit/2b8bd5aaee0d936528899f02e5d3456618b378a3))
+
+## [1.13.2](https://github.com/openupm/openupm/compare/1.13.1...1.13.2) (2020-02-10)
+
+
+### Bug Fixes
+
+* **pipelines:** support tag with _upm suffix ([09b5c82](https://github.com/openupm/openupm/commit/09b5c82abd780fae87e36c97eadaf6e4237ef6d7))
+
+## [1.13.1](https://github.com/openupm/openupm/compare/1.13.0...1.13.1) (2020-02-10)
+
+
+### Bug Fixes
+
+* **pipelines:** support tag with _upm suffix ([ea38fbc](https://github.com/openupm/openupm/commit/ea38fbc5e935eee984ed1ccec09c87a370690f2a))
+
+# [1.13.0](https://github.com/openupm/openupm/compare/1.12.0...1.13.0) (2020-02-09)
+
+
+### Features
+
+* **cli:** show no git tag from pkg:check command ([8788c30](https://github.com/openupm/openupm/commit/8788c30c1d50948e8559eea24a499eae15ffb9e0))
+
+# [1.12.0](https://github.com/openupm/openupm/compare/1.11.1...1.12.0) (2020-02-08)
+
+
+### Features
+
+* **cli:** show git dependencies from check-deps command ([e9fc22b](https://github.com/openupm/openupm/commit/e9fc22b9d55fbed04ffd4287c23b71e8829f28a0))
+
+## [1.11.1](https://github.com/openupm/openupm/compare/1.11.0...1.11.1) (2020-02-08)
+
+
+### Bug Fixes
+
+* **website:** show unity version as tooltip on package detail page ([7184510](https://github.com/openupm/openupm/commit/7184510cb5bbb2e78d8cea1a29fd02f3a90209b4))
+
+# [1.11.0](https://github.com/openupm/openupm/compare/1.10.1...1.11.0) (2020-02-08)
+
+
+### Bug Fixes
+
+* **website:** package detail style fix ([1dff6ca](https://github.com/openupm/openupm/commit/1dff6ca00d5a8f1c393fc5d7c3f0603aedfc0459))
+
+
+### Features
+
+* **cli:** add script to check dependencies ([e9a325e](https://github.com/openupm/openupm/commit/e9a325ef137628a06f28c181c1346447d634bfcb))
+
+## [1.10.1](https://github.com/openupm/openupm/compare/1.10.0...1.10.1) (2020-02-08)
+
+
+### Bug Fixes
+
+* **website:** missing link for unity dependencies ([5751daa](https://github.com/openupm/openupm/commit/5751daaa558efa28acb8a219a450d4dc8964b913))
+
+# [1.10.0](https://github.com/openupm/openupm/compare/1.9.0...1.10.0) (2020-02-07)
+
+
+### Features
+
+* **website:** show dependencies on package detail page ([089d530](https://github.com/openupm/openupm/commit/089d530018ab266155ca6b2c07972f644ade4ed1))
+
+# [1.9.0](https://github.com/openupm/openupm/compare/1.8.2...1.9.0) (2020-02-06)
+
+
+### Features
+
+* **website:** show supported Unity version on package detail page (fix [#52](https://github.com/openupm/openupm/issues/52)) ([8d728ba](https://github.com/openupm/openupm/commit/8d728ba3c00f2b1a1b6c31ff0688b7fb321dd124))
+
+## [1.8.2](https://github.com/openupm/openupm/compare/1.8.1...1.8.2) (2020-02-02)
+
+
+### Bug Fixes
+
+* **pipelines:** handle git tags from both upm and master branches ([40536f7](https://github.com/openupm/openupm/commit/40536f707027d2b8f673c34b1d1c4720c56f7f05))
+
 ## [1.8.1](https://github.com/openupm/openupm/compare/1.8.0...1.8.1) (2020-01-28)
 
 

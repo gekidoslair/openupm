@@ -1,0 +1,16 @@
+name: com.litefeel.bitmapfontimporter
+displayName: BitmapFontImporter
+description: An unity editor extension for bitmap font.
+repoUrl: 'https://github.com/litefeel/Unity-BitmapFontImporter'
+parentRepoUrl: null
+licenseSpdxId: MIT
+licenseName: MIT License
+topics:
+  - 2d
+  - editor-enhancement
+  - gui
+hunter: 'litefeel'
+gitTagPrefix: ''
+gitTagIgnore: ''
+image: 'https://raw.githubusercontent.com/litefeel/Unity-BitmapFontImporter/master/AssetStore/screenshots.png'
+createdAt: 1582997224163

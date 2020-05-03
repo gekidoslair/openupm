@@ -1,0 +1,16 @@
+name: com.thisotherthing.uishapeskit
+displayName: UI Shapes Kit
+description: procedural shapes for Unity UI
+repoUrl: 'https://github.com/adrenak/ui-shapes-kit'
+parentRepoUrl: 'https://github.com/thisotherthing/ui-shapes-kit'
+licenseSpdxId: MIT
+licenseName: MIT License
+topics:
+  - particles-and-effects
+  - utilities
+  - gui
+hunter: adrenak
+gitTagPrefix: ''
+gitTagIgnore: ''
+image: null
+createdAt: 1583926295188

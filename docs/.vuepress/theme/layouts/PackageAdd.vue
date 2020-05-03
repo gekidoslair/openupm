@@ -117,15 +117,34 @@
                   class="form-group column col-12"
                   :class="{ hide: hideOtherFields }"
                 >
+                  <label class="form-label">Git tag prefix</label>
+                  <input
+                    v-model="form.gitTagPrefix.value"
+                    class="form-input"
+                    type="text"
+                    placeholder="leave empty to include all tags (by default)"
+                  />
+                  <span class="form-input-hint is-error">
+                    A prefix to filter Git tags, mostly used by monorepos to
+                    distinguish releases. A prefixed tag should separate the
+                    semver with a slash <code>/</code>, hyphen <code>-</code>,
+                    or underscore <code>_</code>. e.g.
+                    <code>myprefix/x.y.z</code>.
+                  </span>
+                </div>
+                <div
+                  class="form-group column col-12"
+                  :class="{ hide: hideOtherFields }"
+                >
                   <label class="form-label">Git tag ignore pattern</label>
                   <input
                     v-model="form.gitTagIgnore.value"
                     class="form-input"
                     type="text"
-                    placeholder="leave empty to include all tags (default)"
+                    placeholder="leave empty to include all tags (by default)"
                   />
                   <span class="form-input-hint is-error">
-                    Regular expression to exclude git tags from build pipelines:
+                    Regular expression to exclude Git tags from build pipelines:
                     <br />
                     <code v-if="form.gitTagIgnore.value">
                       /{{ form.gitTagIgnore.value }}/i
@@ -173,16 +192,22 @@
                   </div>
                 </div>
                 <div
+                  v-if="repoImages.length"
                   class="form-group column col-12"
                   :class="{
                     hide: hideOtherFields,
                     'has-error': form.image.error
                   }"
                 >
-                  <label v-if="repoImages.length" class="form-label"
-                    >Featured image</label
-                  >
-                  <div v-if="repoImages.length" class="columns pkg-img-columns">
+                  <label class="form-label">Featured image</label>
+                  <div class="form-input-hint is-error">
+                    Notice: if the repository has a
+                    <a
+                      href="https://help.github.com/en/github/administering-a-repository/customizing-your-repositorys-social-media-preview"
+                      >social image</a
+                    >, will use that instead.
+                  </div>
+                  <div class="columns pkg-img-columns">
                     <div
                       v-for="item in repoImages"
                       :key="item"
@@ -244,7 +269,6 @@
                 <a
                   :href="uploadLink.link"
                   class="btn btn-primary"
-                  target="_blank"
                   @click="onUpload"
                   >{{ uploadLink.text }}</a
                 >
@@ -278,7 +302,7 @@
                             <p class="tile-subtitle">
                               Please provide information about the UPM package.
                               Learn more at
-                              <NavLink :item="docLink" target="_blank" />.
+                              <NavLink :item="docLink" />.
                             </p>
                           </div>
                         </div>
@@ -380,7 +404,7 @@ import spdx from "spdx-license-list";
 import urljoin from "url-join";
 import yaml from "js-yaml";
 
-import NavLink from "@parent-theme/components/NavLink.vue";
+import NavLink from "@theme/components/NavLink.vue";
 import ParentLayout from "@theme/layouts/Layout.vue";
 import util from "@root/docs/.vuepress/util";
 
@@ -398,6 +422,10 @@ export default {
       step: 0,
       form: {
         branch: {
+          error: "",
+          value: ""
+        },
+        gitTagPrefix: {
           error: "",
           value: ""
         },
@@ -546,6 +574,7 @@ export default {
         licenseName: form.licenseName.value,
         topics: form.topics.options.filter(x => x.value).map(x => x.slug),
         hunter: form.hunter.value,
+        gitTagPrefix: form.gitTagPrefix.value,
         gitTagIgnore: form.gitTagIgnore.value,
         image: form.image.value,
         createdAt: new Date().getTime()
@@ -617,7 +646,7 @@ export default {
         // Assign data.
         const repoImages =
           resp.data && resp.data.items
-            ? resp.data.items.map(x => util.getGitHubRawUrl(x.html_url))
+            ? resp.data.items.map(x => util.convertToGitHubRawUrl(x.html_url))
             : [];
         this.$data.repoImages = repoImages.slice(0, 100);
       } catch (error) {
@@ -702,7 +731,7 @@ export default {
         this.$data.packageInfo = JSON.parse(content);
         let packageName = this.$data.packageInfo.name;
         if (this.$page.frontmatter.packageNames.includes(packageName))
-          throw new Error(`The package ${packageName} already exists`);
+          throw new Error(`The package ${packageName} already exists.`);
         if (packageName.includes("@"))
           throw new Error(
             `Package name "${packageName}" includes character '@', that is not accepted by UPM. Please contact package owner to modify it.`
